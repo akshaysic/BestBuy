@@ -46,6 +46,11 @@ def start(store):
                             print("Please enter a positive quantity.")
                             continue
 
+                        if qty > product.quantity:
+                            print(
+                                f"Only {product.quantity} of '{product.name}' available. Please enter a smaller quantity.")
+                            continue
+
                         existing = next((item for item in order_list if item[0] == product), None)
                         if existing:
                             order_list = [(p, q + qty) if p == product else (p, q) for p, q in order_list]
