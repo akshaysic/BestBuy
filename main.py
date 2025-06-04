@@ -24,46 +24,78 @@ def start(store):
         elif choice == "2":
             print(f"Total quantity in store: {store.get_total_quantity()}")
 
-        elif choice == "3":
-            order_list = []
-            products_by_name = {p.name.lower(): p for p in store.get_all_products()}
 
-            print("Enter products to order (leave product name empty to finish):")
+        elif choice == "3":
+
+            order_list = []
+
+            products = store.get_all_products()
+
             while True:
-                name_input = input("Product name: ").strip().lower()
-                if not name_input:
+
+                print("\nAvailable Products:")
+
+                for i, p in enumerate(products, 1):
+                    print(f"{i}. {p.name} (In stock: {p.quantity})")
+
+                selection = input("Enter the product number to order (leave blank to finish): ").strip()
+
+                if not selection:
                     break
 
-                product = products_by_name.get(name_input)
-                if not product:
-                    print("Product not found. Please try again.")
-                    continue
-
                 try:
-                    qty_input = input(f"Quantity of '{product.name}': ").strip()
-                    qty = int(qty_input)
-                    if qty <= 0:
-                        print("Please enter a positive quantity.")
-                        continue
 
-                    existing = next((item for item in order_list if item[0].name.lower() == name_input), None)
-                    if existing:
-                        index = order_list.index(existing)
-                        order_list[index] = (existing[0], existing[1] + qty)
+                    index = int(selection) - 1
+
+                    if 0 <= index < len(products):
+
+                        product = products[index]
+
+                        qty_input = input(f"Enter quantity for '{product.name}': ").strip()
+
+                        qty = int(qty_input)
+
+                        if qty <= 0:
+                            print("Please enter a positive quantity.")
+
+                            continue
+
+                        existing = next((item for item in order_list if item[0] == product), None)
+
+                        if existing:
+
+                            order_list = [(p, q + qty) if p == product else (p, q) for p, q in order_list]
+
+                        else:
+
+                            order_list.append((product, qty))
+
+                        print(f"✅ Added {qty} of '{product.name}' to your order.")
+
                     else:
-                        order_list.append((product, qty))
+
+                        print("Invalid product number. Try again.")
 
                 except ValueError:
-                    print("Invalid quantity. Please enter a number.")
+
+                    print("Please enter a valid number.")
 
             if not order_list:
+
                 print("No items ordered.")
+
             else:
+
                 try:
+
                     total = store.order(order_list)
-                    print(f"Order placed! Total cost: ${total:.2f}")
+
+                    print(f"\n🎉 Order placed! Total cost: ${total:.2f}")
+
                 except Exception as order_error:
-                    print(f"Order failed: {order_error}")
+
+                    print(f"❌ Order failed: {order_error}")
+
 
         elif choice == "4":
             print("Thank you for visiting BestBuy!")
